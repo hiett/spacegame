@@ -9,7 +9,6 @@ io.on("connection", function(socket) {
     let player = {socket: socket, x: 0, y: 0, rotX: 0, rotY: 0};
 
     players.push(player);
-
     console.log("Player has connected.");
 
     socket.on("updatelocation", function(locData) {
