@@ -1,3 +1,3 @@
 function SocketManager() {
-    this.connection = io(); // TODO: Implement SocketIo!
+    this.socket = io();
 }

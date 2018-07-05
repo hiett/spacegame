@@ -4,6 +4,8 @@ var c = null;
 var WIDTH = 0;
 var HEIGHT = 0;
 
+var socketManager = null;
+
 var gameScreens = [
     SCREEN_game
 ];
@@ -21,6 +23,10 @@ function init() {
     c = canvas.getContext("2d");
     
     setInterval(mainDraw, 1000 / 60);
+
+    registerEvents();
+
+    socketManager = new SocketManager();
 }
 
 function mainDraw() {

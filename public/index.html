@@ -10,36 +10,25 @@
                 width: 100%;
                 height: 100%;
                 overflow: hidden;
-                animation: colorchange 5s infinite;
-                -webkit-animation: colorchange 5s infinite;
+                background-color: black;
             }
-                
-            @keyframes colorchange {
-              0%   {background: #e74c3c;}
-              25%  {background: #9b59b6;}
-              50%  {background: #3498db;}
-              75%  {background: #2ecc71;}
-              100% {background: #e74c3c;}
-            }
-        
-            @-webkit-keyframes colorchange {
-              0%   {background: #e74c3c;}
-              25%  {background: #9b59b6;}
-              50%  {background: #3498db;}
-              75%  {background: #2ecc71;}
-              100% {background: #e74c3c;}
-            }
+
         </style>
         
         <link href="https://fonts.googleapis.com/css?family=Montserrat:300" rel="stylesheet">
     </head>
     <body>
         <canvas class="gameCanvas" id="gameCanvas"></canvas>
-    
+
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
         <script type="text/javascript" src="js/util.js"></script>
+        <script type="text/javascript" src="js/input.js"></script>
+        <script type="text/javascript" src="js/particle.js"></script>
         <script type="text/javascript" src="js/map.js"></script>
         <script type="text/javascript" src="js/screen.js"></script>
         <script type="text/javascript" src="js/entities.js"></script>
+        <script type="text/javascript" src="js/socket.js"></script>
         <script type="text/javascript" src="js/gamescreens/gamescreen.js"></script>
         <script type="text/javascript" src="js/game.js"></script>
         
