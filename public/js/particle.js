@@ -28,3 +28,26 @@ setInterval(function() {
         particle.addPos(particle.directionX * particle.speed, particle.directionY * particle.speed);
     });
 }, 1000 / 120);
+
+// Some predefined particle effects
+var ParticleEffect = {
+    BIG_EXPLOSION: function(x, y) {
+        for(var i = 0; i < getRandomInt(100, 500); i++) {
+            // Create a particle from the location and give it a random direction
+            particles.push(new Particle(getRandomInt(1, 3), getRandomInt(1, 10), getRandomInt(500, 3000), x, y,
+                (getRandomInt(0, 200) - 100) / 100, (getRandomInt(0, 200) - 100) / 100));
+        }
+    },
+    SHOOT: function (x, y, dx, dy) {
+        var pCount = 0;
+
+        var addShootParticle = function() {
+            particles.push(new Particle(getRandomInt(1, 2), getRandomInt(10, 20), getRandomInt(500, 3000), x, y, dx, dy));
+
+            if(pCount++ <= 30)
+                setTimeout(addShootParticle, getRandomInt(1, 5));
+        };
+
+        addShootParticle();
+    }
+};

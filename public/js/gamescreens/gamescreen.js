@@ -8,6 +8,9 @@ var crtOverlay = false;
 var crtImage = new Image();
 crtImage.src = "../img/overlay.png";
 
+var viewPortX;
+var viewPortY;
+
 var SCREEN_game = new Screen(function() {
     // Draw on the black background
     if(motionBlur) {
@@ -20,8 +23,8 @@ var SCREEN_game = new Screen(function() {
     var playerLocation = localPlayer.loc;
     
     // Work out what tile they're at
-    var viewPortX = -playerLocation.posX;
-    var viewPortY = -playerLocation.posY;
+    viewPortX = -playerLocation.posX;
+    viewPortY = -playerLocation.posY;
 
     // Set the color for this frame
     c.fillStyle = currentColor;
@@ -30,12 +33,17 @@ var SCREEN_game = new Screen(function() {
     // Render the bottom map
     var mapVertIndex = 1;
     currentMap.mapVertices.forEach(function(mapVert) {
+        // Go to the correct pos
+        var sPos = getScreenLoc(mapVert.x, mapVert.y);
+
         c.beginPath();
-        c.moveTo(viewPortX + mapVert.x, viewPortY + mapVert.y);
+
+        c.moveTo(sPos.x, sPos.y);
 
         var otherVert = currentMap.mapVertices[mapVertIndex++];
-        if(otherVert !== undefined) {
-            c.lineTo(viewPortX + otherVert.x, viewPortY + otherVert.y);
+        if (otherVert !== undefined) {
+            var otherPoint = getScreenLoc(otherVert.x, otherVert.y);
+            c.lineTo(otherPoint.x, otherPoint.y);
         }
 
         c.stroke();
@@ -56,7 +64,7 @@ var SCREEN_game = new Screen(function() {
 
     // Add some particles
     for(var pc = 0; pc < getRandomInt(0, 3); pc++) {
-        // Draw on a particle
+        // Add a particle
         particles.push(new Particle(getRandomInt(1, 3), getRandomInt(1, 5), getRandomInt(100, 500),
             localPlayer.loc.posX - Math.cos(atan2PlayerRotation) * 52, localPlayer.loc.posY - Math.sin(atan2PlayerRotation) * 52,
             -Math.cos(atan2PlayerRotation) + ((getRandomInt(1, 100) - 50) / 100), -Math.sin(atan2PlayerRotation) + ((getRandomInt(1, 100) - 50) / 100)));
@@ -84,10 +92,19 @@ var SCREEN_game = new Screen(function() {
 
     // Render particles
     particles.forEach(function(particle) {
-        c.fillRect(viewPortX + (WIDTH / 2) + particle.x, viewPortY + (HEIGHT / 2) + particle.y, particle.size, particle.size);
+        var sPos = getScreenLoc(particle.x, particle.y);
+
+        if(isOnScreen(sPos.x, sPos.y))
+            c.fillRect(sPos.x, sPos.y, particle.size, particle.size);
     });
 
-    drawPredefinedShape(Shape.STAR, 200, 200);
+    // Render stars
+    currentMap.stars.forEach(function(star) {
+        var sPos = getScreenLoc(star.x, star.y);
+
+        if(isOnScreen(sPos.x, sPos.y))
+            drawPredefinedShape(Shape.STAR, sPos.x, sPos.y);
+    });
 
     // CRT overlay
     if(crtOverlay) {
@@ -168,4 +185,12 @@ function calculateShapeMaxSize(shape) {
     });
 
     return {width: maxX, height: maxY};
+}
+
+function isOnScreen(x, y) {
+    return (x > 0 && x < WIDTH && y > 0 && y < HEIGHT);
+}
+
+function getScreenLoc(x, y) {
+    return {x: viewPortX + (WIDTH / 2) + x, y: viewPortY + (HEIGHT / 2) + y};
 }
