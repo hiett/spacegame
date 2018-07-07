@@ -6,8 +6,8 @@ function SocketManager() {
     });
 
     this.socket.on("killstar", function(data) {
-        let star = data.star;
-        let newStarArray = data.starArray;
+        var star = data.star;
+        var newStarArray = data.starArray;
 
         ParticleEffect.SMALL_EXPLOSION(star.x + 50, star.y + 50); // Center it
 
@@ -28,5 +28,18 @@ function SocketManager() {
 
     this.socket.on("setuuid", function(uuid) {
         localPlayer.uuid = uuid;
+    });
+
+    this.socket.on("addplayer", function(player) {
+        players.push(player);
+    });
+
+    this.socket.on("updateotherlocation", function(newData) {
+        players.forEach(function(pl) {
+            if(pl.uuid === newData.uuid) {
+                pl.x = newData.x;
+                pl.y = newData.y;
+            }
+        });
     });
 }

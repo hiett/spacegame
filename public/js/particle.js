@@ -14,7 +14,7 @@ function Particle(size, speed, ttl, x, y, directionX, directionY) {
         this.y += aPosY;
     };
 
-    setTimeout(() => {
+    setTimeout(function() {
         // Delete itself.
         this.dead = true;
         particles.splice(particles.indexOf(this), 1);

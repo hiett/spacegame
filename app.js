@@ -16,9 +16,19 @@ io.on("connection", function(socket) {
 
     socket.emit("setuuid", player.uuid);
 
+    players.forEach(function(p) {
+        if(p.uuid !== player.uuid) {
+            socket.emit("addplayer", {uuid: p.uuid, x: p.x, y: p.y, rotX: p.rotX, rotY: p.rotY});
+        }
+    });
+
+    broadcastWithout("addplayer", {uuid: player.uuid, x: player.x, y: player.y, rotX: player.rotX, rotY: player.rotY}, player);
+
     socket.on("updatelocation", function(locData) {
         player.x = locData.posX;
         player.y = locData.posY;
+
+        broadcastWithout("updateotherlocation", {uuid: player.uuid, x: player.x, y: player.y}, player);
     });
 
     socket.on("shoot", function(x, y, dx, dy) {
@@ -87,6 +97,13 @@ function guid() {
 function broadcastPacket(name, data) {
     players.forEach(function(player) {
         player.socket.emit(name, data);
+    });
+}
+
+function broadcastWithout(name, data, without) {
+    players.forEach(function(player) {
+        if(player.uuid !== without.uuid)
+            player.socket.emit(name, data);
     });
 }
 

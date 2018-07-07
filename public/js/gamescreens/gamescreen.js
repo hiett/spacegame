@@ -2,10 +2,10 @@ var currentColor = "";
 var allColors = ["#2ecc71", "#3498db", "#9b59b6", "#f1c40f", "#e74c3c", "#ecf0f1", "#e67e22"];
 var playerSpeed = 3;
 
-var motionBlur  = false;
-var crtOverlay  = false;
+var motionBlur  = true;
+var crtOverlay  = true;
 var colorChange = true;
-var debug       = false;
+var debug       = true;
 
 var crtImage = new Image();
 crtImage.src = "../img/overlay.png";
@@ -62,13 +62,19 @@ var SCREEN_game = new Screen(function() {
     var playerRotation = Math.atan(playerDeltaY / playerDeltaX);
 
     // Calculate their next position
+    if(keys[16]) {
+        playerSpeed = 10;
+    } else {
+        playerSpeed = 3;
+    }
+
     var atan2PlayerRotation = Math.atan2(playerDeltaY, playerDeltaX);
     localPlayer.loc.add(Math.cos(atan2PlayerRotation) * playerSpeed, Math.sin(atan2PlayerRotation) * playerSpeed);
 
     socketManager.socket.emit("updatelocation", localPlayer.loc);
 
     // Add some particles
-    for(var pc = 0; pc < getRandomInt(0, 3); pc++) {
+    for(var pc = 0; pc < getRandomInt(0, playerSpeed); pc++) {
         // Add a particle
         particles.push(new Particle(getRandomInt(1, 3), getRandomInt(1, 5), getRandomInt(100, 500),
             localPlayer.loc.posX - Math.cos(atan2PlayerRotation) * 52, localPlayer.loc.posY - Math.sin(atan2PlayerRotation) * 52,
@@ -109,6 +115,12 @@ var SCREEN_game = new Screen(function() {
 
         if(isOnScreen(sPos.x, sPos.y))
             drawPredefinedShape(Shape.STAR, sPos.x, sPos.y);
+    });
+
+    // Draw on other players
+    players.forEach(function (pl) {
+        var drawLoc = getScreenLoc(pl.x, pl.y);
+        drawPredefinedShape(Shape.SPACESHIP, drawLoc.x, drawLoc.y);
     });
 
     // Draw on how many points they have just earned
