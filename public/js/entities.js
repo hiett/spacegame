@@ -21,3 +21,5 @@ function Player() {
 var localPlayer = new Player();
 localPlayer.name = "You";
 localPlayer.uuid = "1";
+
+var players = [];

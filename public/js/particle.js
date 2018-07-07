@@ -22,6 +22,11 @@ function Particle(size, speed, ttl, x, y, directionX, directionY) {
 }
 
 var particles = [];
+var cachedParticleSize = 0;
+
+setInterval(function() {
+    cachedParticleSize = particles.length;
+}, 500);
 
 setInterval(function() {
     particles.forEach(function(particle) {
@@ -35,6 +40,13 @@ var ParticleEffect = {
         for(var i = 0; i < getRandomInt(100, 500); i++) {
             // Create a particle from the location and give it a random direction
             particles.push(new Particle(getRandomInt(1, 3), getRandomInt(1, 10), getRandomInt(500, 3000), x, y,
+                (getRandomInt(0, 200) - 100) / 100, (getRandomInt(0, 200) - 100) / 100));
+        }
+    },
+    SMALL_EXPLOSION: function(x, y) {
+        for(var i = 0; i < getRandomInt(50, 200); i++) {
+            // Create a particle from the location and give it a random direction
+            particles.push(new Particle(getRandomInt(1, 3), getRandomInt(1, 10), getRandomInt(200, 1500), x, y,
                 (getRandomInt(0, 200) - 100) / 100, (getRandomInt(0, 200) - 100) / 100));
         }
     },

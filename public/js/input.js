@@ -24,6 +24,9 @@ function registerEvents() {
             var atan2PlayerRotation = Math.atan2(playerDeltaY, playerDeltaX);
             // localPlayer.loc.add(Math.cos(atan2PlayerRotation) * playerSpeed, Math.sin(atan2PlayerRotation) * playerSpeed);
 
+            socketManager.socket.emit("shoot", localPlayer.loc.posX, localPlayer.loc.posY, Math.cos(atan2PlayerRotation),
+                Math.sin(atan2PlayerRotation));
+
             ParticleEffect.SHOOT(localPlayer.loc.posX, localPlayer.loc.posY, Math.cos(atan2PlayerRotation),
                 Math.sin(atan2PlayerRotation));
         }

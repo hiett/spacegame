@@ -2,14 +2,19 @@ var currentColor = "";
 var allColors = ["#2ecc71", "#3498db", "#9b59b6", "#f1c40f", "#e74c3c", "#ecf0f1", "#e67e22"];
 var playerSpeed = 3;
 
-var motionBlur = false;
-var crtOverlay = false;
+var motionBlur  = false;
+var crtOverlay  = false;
+var colorChange = true;
+var debug       = false;
 
 var crtImage = new Image();
 crtImage.src = "../img/overlay.png";
 
 var viewPortX;
 var viewPortY;
+
+var currentScreenRenderPoints = 0;
+var currentPoints = 0;
 
 var SCREEN_game = new Screen(function() {
     // Draw on the black background
@@ -106,19 +111,60 @@ var SCREEN_game = new Screen(function() {
             drawPredefinedShape(Shape.STAR, sPos.x, sPos.y);
     });
 
+    // Draw on how many points they have just earned
+    if(currentScreenRenderPoints !== 0) {
+        var pointsInString = currentScreenRenderPoints + "";
+        var pointsIntArray = [];
+        for (var pI = 0; pI < pointsInString.length; pI++)
+            pointsIntArray.push(parseInt(pointsInString[pI]));
+
+        var pointsShapeArray = [Shape.Letter.PLUS];
+        intArrayToShapeArray(pointsIntArray).forEach(function(itm) {
+            pointsShapeArray.push(itm);
+        });
+
+        drawShapeString(pointsShapeArray, WIDTH / 2 - calculateShapeTextWidth(pointsShapeArray) / 2, HEIGHT - 100);
+    }
+
+    // Render current total points
+    var totalPointsString = currentPoints + "";
+    var totalPointsInIntArray = [];
+    for(var tPI = 0; tPI < totalPointsString.length; tPI++)
+        totalPointsInIntArray.push(parseInt(totalPointsString[tPI]));
+
+    var pointsShapeArray = intArrayToShapeArray(totalPointsInIntArray);
+
+    drawShapeString(pointsShapeArray, WIDTH - 10 - calculateShapeTextWidth(pointsShapeArray), 10);
+
+    // var message = [Shape.Letter.PLUS, Shape.Letter.FIVE, Shape.Letter.ZERO, Shape.Letter.ZERO];
+    // drawShapeString(message, WIDTH / 2 - calculateShapeTextWidth(message) / 2, HEIGHT - 100);
+
     // CRT overlay
     if(crtOverlay) {
         c.drawImage(crtImage, 0, 0, WIDTH, HEIGHT);
     }
 
     // Draw on text
-    c.fillStyle = "white";
-    c.font = "30px 'Montserrat'";
-    centerText("[ 100% ] [ 100 / 100 ] [ 100% ]", HEIGHT - 50);
+    // c.fillStyle = "white";
+    // c.font = "30px 'Montserrat'";
+    // centerText("[ 100% ] [ 100 / 100 ] [ 100% ]", HEIGHT - 50);
+
+    // Draw Particle Size
+    if(debug) {
+        var inStringForm = cachedParticleSize + "";
+        var completeIntArray = [];
+        for (var i = 0; i < inStringForm.length; i++)
+            completeIntArray.push(parseInt(inStringForm[i]));
+
+        drawShapeString(intArrayToShapeArray(completeIntArray), 10, 10);
+    }
 });
 
 setInterval(function(){
-    currentColor = allColors[getRandomInt(0, allColors.length)];
+    if(colorChange)
+        currentColor = allColors[getRandomInt(0, allColors.length)];
+    else
+        currentColor = "white";
 }, 1000 / 15);
 
 function drawPredefinedShape(shape, x, y) {
@@ -138,6 +184,90 @@ function drawPredefinedShape(shape, x, y) {
 }
 
 var Shape = {
+    Letter: {
+        PLUS: [
+            {x: 5, y: 5},
+            {x: 5, y: 15},
+            {x: 5, y: 10},
+            {x: 0, y: 10},
+            {x: 10, y: 10}
+        ],
+        ZERO: [
+            {x: 0, y: 0},
+            {x: 10, y: 0},
+            {x: 10, y: 20},
+            {x: 0, y: 20},
+            {x: 0, y: 0}
+        ],
+        ONE: [
+            {x: 0, y: 0},
+            {x: 0, y: 20}
+        ],
+        TWO: [
+            {x: 0, y: 0},
+            {x: 10, y: 0},
+            {x: 10, y: 10},
+            {x: 0, y: 20},
+            {x: 10, y: 20}
+        ],
+        THREE: [
+            {x: 0, y: 0},
+            {x: 10, y: 0},
+            {x: 10, y: 10},
+            {x: 0, y: 10},
+            {x: 10, y: 10},
+            {x: 10, y: 20},
+            {x: 0, y: 20}
+        ],
+        FOUR: [
+            {x: 0, y: 0},
+            {x: 0, y: 10},
+            {x: 5, y: 10},
+            {x: 5, y: 20},
+            {x: 5, y: 0},
+            {x: 5, y: 10},
+            {x: 10, y: 10}
+        ],
+        FIVE: [
+            {x: 10, y: 0},
+            {x: 0, y: 0},
+            {x: 0, y: 10},
+            {x: 10, y: 10},
+            {x: 10, y: 20},
+            {x: 0, y: 20}
+        ],
+        SIX: [
+            {x: 10, y: 0},
+            {x: 0, y: 0},
+            {x: 0, y: 20},
+            {x: 10, y: 20},
+            {x: 10, y: 10},
+            {x: 0, y: 10}
+        ],
+        SEVEN: [
+            {x: 0, y: 0},
+            {x: 10, y: 0},
+            {x: 0, y: 20}
+        ],
+        EIGHT: [
+            {x: 10, y: 10},
+            {x: 10, y: 0},
+            {x: 0, y: 0},
+            {x: 0, y: 20},
+            {x: 10, y: 20},
+            {x: 10, y: 10},
+            {x: 0, y: 10}
+        ],
+        NINE: [
+            {x: 10, y: 10},
+            {x: 10, y: 0},
+            {x: 0, y: 0},
+            {x: 0, y: 10},
+            {x: 10, y: 10},
+            {x: 10, y: 20},
+            {x: 0, y: 20}
+        ]
+    },
     SPACESHIP: [
         {x: 0, y: 10},
         {x: 0, y: 20},
@@ -175,6 +305,9 @@ var Shape = {
 };
 
 function calculateShapeMaxSize(shape) {
+    if(shape === null)
+        return 10;
+
     var maxX = 0, maxY = 0;
 
     shape.forEach(function(vert) {
@@ -187,10 +320,61 @@ function calculateShapeMaxSize(shape) {
     return {width: maxX, height: maxY};
 }
 
+function calculateShapeTextWidth(shapeArray) {
+    var total = 0;
+
+    shapeArray.forEach(function(shapeItem) {
+        total += 10 + calculateShapeMaxSize(shapeItem).width;
+    });
+
+    return total;
+}
+
+function intArrayToShapeArray(intArray) {
+    var shapeArray = [];
+
+    intArray.forEach(function(intItem) {
+        shapeArray.push(intToShape(intItem));
+    });
+
+    return shapeArray;
+}
+
+function intToShape(intItem) {
+    switch (intItem) {
+        case 0: return Shape.Letter.ZERO;
+        case 1: return Shape.Letter.ONE;
+        case 2: return Shape.Letter.TWO;
+        case 3: return Shape.Letter.THREE;
+        case 4: return Shape.Letter.FOUR;
+        case 5: return Shape.Letter.FIVE;
+        case 6: return Shape.Letter.SIX;
+        case 7: return Shape.Letter.SEVEN;
+        case 8: return Shape.Letter.EIGHT;
+        case 9: return Shape.Letter.NINE;
+    }
+
+    return null;
+}
+
 function isOnScreen(x, y) {
     return (x > 0 && x < WIDTH && y > 0 && y < HEIGHT);
 }
 
 function getScreenLoc(x, y) {
     return {x: viewPortX + (WIDTH / 2) + x, y: viewPortY + (HEIGHT / 2) + y};
+}
+
+function drawShapeString(shapeArray, x, y) {
+    var spacerCount = 0;
+
+    shapeArray.forEach(function(shapeItem) {
+        if(shapeItem === null) {
+            spacerCount += 20;
+        } else {
+            drawPredefinedShape(shapeItem, x + spacerCount, y);
+
+            spacerCount += calculateShapeMaxSize(shapeItem).width + 10;
+        }
+    });
 }
