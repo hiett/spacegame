@@ -39,7 +39,13 @@ function SocketManager() {
             if(pl.uuid === newData.uuid) {
                 pl.x = newData.x;
                 pl.y = newData.y;
+                pl.rotation = newData.rotation;
             }
         });
+    });
+
+    this.socket.on("removeplayer", function(toRemoveUUID) {
+        // Find the player that has this uuid and remove them
+        players.splice(players.indexOf(getPlayerFromUUID(toRemoveUUID)), 1);
     });
 }

@@ -9,7 +9,7 @@ let stars = [];
 const starWidth = 100;
 
 io.on("connection", function(socket) {
-    let player = {uuid: guid(), socket: socket, x: 0, y: 0, rotX: 0, rotY: 0};
+    let player = {uuid: guid(), socket: socket, x: 0, y: 0, rotation: 0};
 
     players.push(player);
     console.log("Player has connected.");
@@ -18,17 +18,18 @@ io.on("connection", function(socket) {
 
     players.forEach(function(p) {
         if(p.uuid !== player.uuid) {
-            socket.emit("addplayer", {uuid: p.uuid, x: p.x, y: p.y, rotX: p.rotX, rotY: p.rotY});
+            socket.emit("addplayer", {uuid: p.uuid, x: p.x, y: p.y, rotation: p.rotation});
         }
     });
 
-    broadcastWithout("addplayer", {uuid: player.uuid, x: player.x, y: player.y, rotX: player.rotX, rotY: player.rotY}, player);
+    broadcastWithout("addplayer", {uuid: player.uuid, x: player.x, y: player.y, rotation: player.rotation}, player);
 
     socket.on("updatelocation", function(locData) {
-        player.x = locData.posX;
-        player.y = locData.posY;
+        player.x = locData.loc.posX;
+        player.y = locData.loc.posY;
+        player.rotation = locData.rotation;
 
-        broadcastWithout("updateotherlocation", {uuid: player.uuid, x: player.x, y: player.y}, player);
+        broadcastWithout("updateotherlocation", {uuid: player.uuid, x: player.x, y: player.y, rotation: player.rotation}, player);
     });
 
     socket.on("shoot", function(x, y, dx, dy) {
@@ -44,6 +45,9 @@ io.on("connection", function(socket) {
     socket.on("disconnect", function() {
         // They've disconnected. Remove them from the pool.
         console.log("Player has disconnected.");
+
+        broadcastWithout("removeplayer", {uuid: player.uuid}, player);
+
         players.splice(player, 1);
     });
 });
@@ -73,10 +77,12 @@ function calculateHitDetection(x, y, dx, dy, callback) {
 // Periodically add stars
 setInterval(function() {
     // Add a star
-    let star = {x: getRandomInt(0, 1000), y: getRandomInt(0, 1000), health: 100, uuid: guid()};
-    stars.push(star);
+    if(stars.length < 20) {
+        let star = {x: getRandomInt(0, 1000), y: getRandomInt(0, 1000), health: 100, uuid: guid()};
+        stars.push(star);
 
-    broadcastPacket("addstar", star);
+        broadcastPacket("addstar", star);
+    } // Prevent loads of stars from being created.
 }, 3000);
 
 function getRandomInt(min, max) {

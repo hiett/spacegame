@@ -23,3 +23,11 @@ localPlayer.name = "You";
 localPlayer.uuid = "1";
 
 var players = [];
+
+function getPlayerFromUUID(uuid) {
+    for(var i = 0; i < players.length; i++)
+        if(players[i].uuid === uuid)
+            return players[i];
+    
+    return null;
+}

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+mkdir public/js/out # Make the out folder to prevent uglify from erroring.
+
 uglifyjs \
     public/js/util.js \
     public/js/particle.js \

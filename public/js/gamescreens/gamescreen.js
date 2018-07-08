@@ -2,9 +2,9 @@ var currentColor = "";
 var allColors = ["#2ecc71", "#3498db", "#9b59b6", "#f1c40f", "#e74c3c", "#ecf0f1", "#e67e22"];
 var playerSpeed = 3;
 
-var motionBlur  = true;
-var crtOverlay  = true;
-var colorChange = true;
+var motionBlur  = false;
+var crtOverlay  = false;
+var colorChange = false;
 var debug       = true;
 
 var crtImage = new Image();
@@ -18,16 +18,13 @@ var currentPoints = 0;
 
 var SCREEN_game = new Screen(function() {
     // Draw on the black background
-    if(motionBlur) {
-        c.fillStyle = "rgba(0, 0, 0, 0.4)";
-    } else {
-        c.fillStyle = "black";
-    }
+    c.fillStyle = motionBlur ? "rgba(0, 0, 0, 0.4)" : "black";
+
     c.fillRect(0, 0, WIDTH, HEIGHT);
 
     var playerLocation = localPlayer.loc;
-    
-    // Work out what tile they're at
+
+    // Calculate the viewport.
     viewPortX = -playerLocation.posX;
     viewPortY = -playerLocation.posY;
 
@@ -71,7 +68,7 @@ var SCREEN_game = new Screen(function() {
     var atan2PlayerRotation = Math.atan2(playerDeltaY, playerDeltaX);
     localPlayer.loc.add(Math.cos(atan2PlayerRotation) * playerSpeed, Math.sin(atan2PlayerRotation) * playerSpeed);
 
-    socketManager.socket.emit("updatelocation", localPlayer.loc);
+    socketManager.socket.emit("updatelocation", {loc: localPlayer.loc, rotation: playerRotation});
 
     // Add some particles
     for(var pc = 0; pc < getRandomInt(0, playerSpeed); pc++) {
@@ -119,8 +116,26 @@ var SCREEN_game = new Screen(function() {
 
     // Draw on other players
     players.forEach(function (pl) {
+        c.save();
+
         var drawLoc = getScreenLoc(pl.x, pl.y);
+
+        c.translate(drawLoc.x, drawLoc.y);
+        c.rotate(pl.rotation);
+
+        // if(true) {
+        //     c.scale(-1, 1);
+        // } else {
+            c.scale(1, -1);
+        // }
+
+        c.translate(-drawLoc.x, -drawLoc.y);
+
+
         drawPredefinedShape(Shape.SPACESHIP, drawLoc.x, drawLoc.y);
+
+
+        c.restore();
     });
 
     // Draw on how many points they have just earned
